@@ -1,0 +1,696 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>RED DAVID</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout "Opción frugal": portada tipo tablero (hero, 4 accesos, avance + donativo, convocatorias + recursos, banda de cifras) y vistas internas por sección.
+   Ahorro de datos: sin fotos ni fuentes descargadas; se usan las tipografías que ya trae cada celular. */
+:root {
+  --bg: #FFFFFF;
+  --band: #FBF8F7;
+  --ink: #1F1A1A;
+  --muted: #6B6261;
+  --line: #ECE6E4;
+  --red: #C8102E;
+  --red-strong: #A90D26;
+  --red-soft: #FBE9EC;
+  --on-red: #FFFFFF;
+  --ok: #2F7A4F;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --radius: 10px;
+  --wrap: 1180px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161213; --band: #1E191A; --ink: #F3EDEC; --muted: #B4A9A8; --line: #342C2D;
+    --red: #F0485F; --red-strong: #FF7487; --red-soft: #3A1A20; --on-red: #161213; --ok: #6CC793;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #161213; --band: #1E191A; --ink: #F3EDEC; --muted: #B4A9A8; --line: #342C2D;
+  --red: #F0485F; --red-strong: #FF7487; --red-soft: #3A1A20; --on-red: #161213; --ok: #6CC793;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 16px; line-height: 1.5; }
+.wrap {
+  max-width: var(--wrap); margin-inline: auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+h1, h2, h3 { margin: 0; line-height: 1.12; text-wrap: balance; }
+h1 { font-size: clamp(2rem, 4.6vw, 3.3rem); font-weight: 800; letter-spacing: -.02em; }
+h2 { font-size: clamp(1.3rem, 2.4vw, 1.6rem); font-weight: 800; }
+h3 { font-size: 1rem; font-weight: 700; }
+p { margin: 0; }
+a { color: var(--red-strong); }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--red); outline-offset: 2px; border-radius: 6px; }
+.muted { color: var(--muted); }
+.small { font-size: .88rem; }
+.ico { width: 22px; height: 22px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.ico.fill { fill: currentColor; stroke: none; }
+.tag { display: inline-block; font-size: .74rem; font-weight: 600; padding: 2px 9px; border-radius: 6px; background: var(--red-soft); color: var(--red-strong); white-space: nowrap; }
+.tag.neutral { background: transparent; border: 1px solid var(--line); color: var(--muted); }
+
+/* Aviso de prototipo */
+.demo-bar { background: var(--band); border-bottom: 1px solid var(--line); font-size: .82rem; color: var(--muted); }
+.demo-bar .wrap { padding-block: 6px; text-align: center; }
+
+/* Encabezado */
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+header.site { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); }
+header.site .wrap { display: flex; align-items: center; gap: 20px; padding-block: 12px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.brand .logo { width: 36px; height: 36px; color: var(--red); }
+.brand-name { display: block; font-weight: 900; font-size: 1.3rem; color: var(--red); letter-spacing: -.01em; line-height: 1; }
+.brand-sub { display: block; font-size: .58rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-top: 3px; }
+nav.main { display: flex; gap: 6px; margin-inline: auto; }
+nav.main a { text-decoration: none; color: var(--ink); font-size: .9rem; font-weight: 500; padding: 10px 10px; white-space: nowrap; border-bottom: 2px solid transparent; }
+nav.main a:hover { color: var(--red-strong); }
+nav.main a[aria-current="page"] { color: var(--red-strong); font-weight: 700; border-bottom-color: var(--red); }
+.header-actions { display: flex; gap: 10px; flex: none; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 44px; padding: 10px 18px; border-radius: 8px; border: 1.5px solid var(--red);
+  background: var(--red); color: var(--on-red); font-weight: 700; font-size: .92rem; text-decoration: none; cursor: pointer;
+}
+.btn .ico { width: 18px; height: 18px; }
+.btn.ghost { background: var(--bg); color: var(--red-strong); }
+.btn.dark-ghost { background: var(--bg); color: var(--ink); border-color: var(--ink); }
+.btn.block { width: 100%; }
+.menu-toggle { display: none; margin-left: auto; min-height: 44px; background: none; border: 1.5px solid var(--line); border-radius: 8px; padding: 6px 14px; font-weight: 700; cursor: pointer; }
+.see-all { font-size: .82rem; font-weight: 700; color: var(--red-strong); text-decoration: none; white-space: nowrap; }
+.see-all::after { content: " \2192"; }
+
+@media (max-width: 1100px) {
+  .menu-toggle { display: inline-flex; align-items: center; }
+  .header-actions { display: none; }
+  nav.main {
+    display: none; position: absolute; left: 0; right: 0; top: 100%; margin: 0;
+    flex-direction: column; gap: 0; background: var(--bg); border-bottom: 1px solid var(--line);
+    padding: 8px max(16px, env(safe-area-inset-right, 0px)) 14px max(16px, env(safe-area-inset-left, 0px));
+  }
+  nav.main.open { display: flex; }
+  nav.main a { padding: 12px 4px; border-bottom: 1px solid var(--line); }
+  nav.main .mobile-actions { display: flex; gap: 10px; padding-top: 12px; }
+}
+nav.main .mobile-actions { display: none; }
+
+/* Portada */
+.hero .wrap { display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: center; padding-block: 44px 36px; }
+.hero h1 .accent { color: var(--red); display: block; }
+.hero p { color: var(--muted); font-size: 1.08rem; max-width: 52ch; margin-top: 12px; }
+.hero-actions { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 22px; }
+.hero-heart { width: 120px; height: 120px; color: var(--red); margin-right: 40px; }
+
+.features { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.features .wrap { display: grid; grid-template-columns: repeat(4, 1fr); }
+.feature { display: flex; gap: 14px; padding: 20px 18px; text-decoration: none; color: var(--ink); min-width: 0; }
+.feature + .feature { border-left: 1px solid var(--line); }
+.feature .ico { width: 34px; height: 34px; color: var(--red); stroke-width: 1.6; }
+.feature:hover h3 { color: var(--red-strong); }
+
+.duo .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+.duo { border-bottom: 1px solid var(--line); }
+.box { padding-block: 22px; display: grid; gap: 14px; align-content: start; min-width: 0; }
+.duo .box:first-child { padding-right: 28px; border-right: 1px solid var(--line); }
+.duo .box:last-child { padding-left: 28px; }
+.box-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+
+.student { display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: center; }
+.student-id { display: flex; gap: 14px; align-items: center; padding-right: 20px; border-right: 1px solid var(--line); }
+.initials { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; flex: none; background: var(--red); color: var(--on-red); font-weight: 800; }
+.initials.soft { background: var(--red-soft); color: var(--red-strong); }
+.goal { display: grid; gap: 6px; min-width: 0; }
+.bar-row { display: flex; align-items: center; gap: 12px; }
+.bar { flex: 1; height: 9px; border-radius: 999px; background: var(--red-soft); overflow: hidden; }
+.bar > i { display: block; height: 100%; background: var(--red); border-radius: 999px; }
+.num { font-weight: 800; font-variant-numeric: tabular-nums; }
+.mini { display: flex; gap: 0; margin-top: 6px; flex-wrap: wrap; }
+.mini span { display: inline-flex; align-items: center; gap: 6px; font-size: .82rem; color: var(--muted); padding: 0 14px; }
+.mini span:first-child { padding-left: 0; }
+.mini span + span { border-left: 1px solid var(--line); }
+.mini .ico { width: 18px; height: 18px; color: var(--ink); }
+
+.amounts { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+.amount { border: 1.5px solid var(--line); background: var(--bg); border-radius: 8px; padding: 10px 6px; cursor: pointer; display: grid; gap: 2px; text-align: center; min-height: 58px; align-content: center; }
+.amount b { font-size: 1.02rem; font-variant-numeric: tabular-nums; }
+.amount span { font-size: .72rem; color: var(--muted); }
+.amount[aria-pressed="true"] { background: var(--red); border-color: var(--red); color: var(--on-red); }
+.amount[aria-pressed="true"] span { color: var(--on-red); }
+.amount input { width: 100%; border: 0; background: transparent; text-align: center; font-size: .85rem; padding: 0; }
+.confirm { border: 1.5px dashed var(--red); border-radius: 8px; padding: 12px 14px; background: var(--red-soft); display: grid; gap: 4px; font-size: .92rem; }
+
+.rows { list-style: none; margin: 0; padding: 0; }
+.rows li { display: grid; grid-template-columns: 1.4fr .8fr 1.2fr; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: .9rem; }
+.rows li:last-child { border-bottom: 0; }
+.rows .when { color: var(--muted); font-size: .84rem; text-align: right; }
+.rows .desc { color: var(--muted); font-size: .84rem; }
+
+.stats { background: var(--red); color: var(--on-red); }
+.stats .wrap { display: grid; grid-template-columns: repeat(4, 1fr); padding-block: 16px 10px; }
+.stat { display: flex; gap: 14px; align-items: center; justify-content: center; padding: 6px 12px; }
+.stat + .stat { border-left: 1px solid rgba(255,255,255,.35); }
+.stat .ico { width: 30px; height: 30px; }
+.stat b { font-size: 1.35rem; font-variant-numeric: tabular-nums; display: block; line-height: 1.1; }
+.stat span { font-size: .82rem; }
+.stats-note { grid-column: 1 / -1; text-align: center; font-size: .74rem; opacity: .85; padding-top: 8px; }
+
+/* Vistas internas */
+section.inner { padding-block: 36px 56px; }
+.inner-head { display: grid; gap: 8px; margin-bottom: 26px; max-width: 70ch; }
+.inner-head p { color: var(--muted); }
+.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.card { border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; display: grid; gap: 10px; align-content: start; background: var(--bg); min-width: 0; }
+.card[aria-pressed="true"] { border-color: var(--red); box-shadow: 0 0 0 1.5px var(--red) inset; }
+.card-top { display: flex; gap: 12px; align-items: center; }
+.need { display: flex; justify-content: space-between; gap: 10px; border-top: 1px dashed var(--line); padding-top: 10px; font-size: .9rem; }
+.split { display: grid; grid-template-columns: 1.1fr .9fr; gap: 28px; align-items: start; margin-top: 28px; }
+.panel { border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; display: grid; gap: 14px; background: var(--bg); min-width: 0; }
+.seg { display: inline-flex; border: 1.5px solid var(--red); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; background: transparent; padding: 8px 14px; min-height: 40px; font-weight: 700; cursor: pointer; color: var(--red-strong); }
+.seg button[aria-pressed="true"] { background: var(--red); color: var(--on-red); }
+.field { display: grid; gap: 6px; }
+.field label { font-weight: 600; font-size: .9rem; }
+.field input, .field select { border: 1.5px solid var(--line); border-radius: 8px; padding: 10px 12px; min-height: 44px; background: var(--bg); width: 100%; }
+.dots-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.dots-list li { display: grid; grid-template-columns: 10px 1fr; gap: 12px; }
+.dots-list li::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--red); margin-top: 7px; }
+.kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.kpi { border: 1px solid var(--line); border-radius: 8px; padding: 12px; display: grid; gap: 2px; }
+.kpi b { font-size: 1.4rem; font-variant-numeric: tabular-nums; }
+.kpi span { font-size: .8rem; color: var(--muted); }
+.timeline { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.timeline li { display: grid; grid-template-columns: 90px 1fr; gap: 12px; font-size: .93rem; }
+.timeline b { color: var(--muted); }
+.privacy { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px; }
+.privacy ul { margin: 8px 0 0; padding-left: 20px; display: grid; gap: 6px; }
+.privacy .yes h3 { color: var(--ok); }
+.privacy .no h3 { color: var(--red-strong); }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+.chip { border: 1.5px solid var(--line); background: var(--bg); border-radius: 8px; padding: 6px 14px; min-height: 44px; font-weight: 600; cursor: pointer; }
+.chip[aria-pressed="true"] { border-color: var(--red); color: var(--red-strong); background: var(--red-soft); }
+.card dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 0; font-size: .88rem; }
+.card dt { color: var(--muted); }
+.card dd { margin: 0; font-weight: 600; }
+.price { font-weight: 800; font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+.inline-msg { font-size: .88rem; color: var(--red-strong); font-weight: 600; min-height: 1.3em; }
+.roadmap { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 2px solid var(--ink); }
+.phase { padding: 16px 16px 0 0; display: grid; gap: 6px; align-content: start; min-width: 0; }
+.phase + .phase { padding-left: 16px; border-left: 1px solid var(--line); }
+.indicators { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.allies { display: flex; flex-wrap: wrap; gap: 8px; }
+
+footer.site { border-top: 1px solid var(--line); }
+footer.site .wrap { display: flex; gap: 18px; align-items: center; justify-content: space-between; flex-wrap: wrap; padding-block: 18px; font-size: .84rem; }
+footer.site nav { display: flex; flex-wrap: wrap; }
+footer.site nav a { color: var(--muted); text-decoration: none; padding: 4px 12px; }
+footer.site nav a + a { border-left: 1px solid var(--line); }
+footer.site .contact { display: flex; gap: 16px; flex-wrap: wrap; color: var(--muted); }
+footer.site .contact span { display: inline-flex; gap: 6px; align-items: center; }
+footer.site .contact .ico { width: 16px; height: 16px; }
+.foot-note { flex-basis: 100%; color: var(--muted); font-size: .78rem; }
+
+@media (max-width: 900px) {
+  .hero .wrap { grid-template-columns: 1fr; }
+  .hero-heart { display: none; }
+  .features .wrap { grid-template-columns: 1fr 1fr; }
+  .feature:nth-child(3) { border-left: 0; }
+  .feature:nth-child(n+3) { border-top: 1px solid var(--line); }
+  .duo .wrap { grid-template-columns: 1fr; }
+  .duo .box:first-child { padding-right: 0; border-right: 0; border-bottom: 1px solid var(--line); }
+  .duo .box:last-child { padding-left: 0; }
+  .stats .wrap { grid-template-columns: 1fr 1fr; row-gap: 12px; }
+  .stat:nth-child(3) { border-left: 0; }
+  .cards { grid-template-columns: 1fr 1fr; }
+  .split { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .features .wrap { grid-template-columns: 1fr; }
+  .feature + .feature { border-left: 0; border-top: 1px solid var(--line); }
+  .student { grid-template-columns: 1fr; }
+  .student-id { border-right: 0; padding-right: 0; }
+  .mini { gap: 6px 16px; }
+  .mini span { padding: 0; }
+  .mini span + span { border-left: 0; }
+  .amounts { grid-template-columns: repeat(2, 1fr); }
+  .amount.other { grid-column: 1 / -1; }
+  .rows li { grid-template-columns: 1fr auto; }
+  .rows .when, .rows .desc { grid-column: 1 / -1; text-align: left; margin-top: -6px; }
+  .stat { justify-content: flex-start; }
+  .cards, .privacy, .indicators, .roadmap { grid-template-columns: 1fr; }
+  .phase + .phase { padding-left: 0; border-left: 0; border-top: 1px solid var(--line); }
+  .kpis { grid-template-columns: repeat(3, 1fr); }
+  .timeline li { grid-template-columns: 1fr; gap: 2px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="logo" viewBox="0 0 48 48"><path d="M24 43C11 33 3 26 3 16.5 3 9.6 8.4 4.5 14.8 4.5c4 0 7.3 2 9.2 5 1.9-3 5.2-5 9.2-5C39.6 4.5 45 9.6 45 16.5 45 26 37 33 24 43Z" fill="currentColor"/><path d="M14 22.5l6.5-5.5 4.5 3 6-4 4.5 5M19.5 26l3 3M23.5 24l3.5 3.5M27.5 22l3 3" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20.5C6 16 2.5 12.8 2.5 8.6 2.5 5.7 4.8 3.5 7.6 3.5c1.8 0 3.4.9 4.4 2.3 1-1.4 2.6-2.3 4.4-2.3 2.8 0 5.1 2.2 5.1 5.1 0 4.2-3.5 7.4-9.5 11.9Z"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><circle cx="17" cy="9" r="2.6"/><path d="M16.5 14.6c2.7 0 4.5 1.6 5 4.4"/></symbol>
+  <symbol id="i-megaphone" viewBox="0 0 24 24"><path d="M3 10v4h3l8 4.5V5.5L6 10H3Z"/><path d="M6 14l1.5 5h2.5L9 14.8M17.5 9.5c1 .7 1 4.3 0 5M20 7.5c2 1.8 2 7.2 0 9"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M12 6.5C10 5 7 4.5 3 4.8v13.5c4-.3 7 .2 9 1.7 2-1.5 5-2 9-1.7V4.8c-4-.3-7 .2-9 1.7Zm0 0V20"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V13h3.5v7H4Zm6.25 0V9h3.5v11h-3.5ZM16.5 20V4H20v16h-3.5Z"/></symbol>
+  <symbol id="i-cap" viewBox="0 0 24 24"><path d="M2 9l10-4.5L22 9l-10 4.5L2 9Z"/><path d="M6 11v4.5c1.5 1.5 3.5 2.2 6 2.2s4.5-.7 6-2.2V11M22 9v5"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c.8-4 3.9-6.3 8-6.3s7.2 2.3 8 6.3"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6V3Z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5 12 13l8.5-6.5"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.5"/></symbol>
+</svg>
+
+<div class="demo-bar" role="note"><div class="wrap"><strong>Prototipo de demostración.</strong> Historias, cifras y convocatorias de ejemplo. Ningún botón realiza cobros ni envía datos.</div></div>
+
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="#inicio" aria-label="RED DAVID, inicio">
+      <svg class="logo"><use href="#logo"/></svg>
+      <span><span class="brand-name">RED DAVID</span><span class="brand-sub">Oportunidades que transforman</span></span>
+    </a>
+    <button class="menu-toggle" id="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menú</button>
+    <nav class="main" id="main-nav" aria-label="Secciones">
+      <a href="#inicio">Inicio</a>
+      <a href="#convocatorias">Convocatorias</a>
+      <a href="#apadrina">Apadrina</a>
+      <a href="#padres">Recursos para padres</a>
+      <a href="#impacto">Impacto</a>
+      <a href="#nosotros">Nosotros</a>
+      <div class="mobile-actions">
+        <button class="btn dark-ghost" type="button" data-login><svg class="ico"><use href="#i-user"/></svg>Iniciar sesión</button>
+        <a class="btn" href="#apadrina"><svg class="ico fill"><use href="#i-heart"/></svg>Donar</a>
+      </div>
+    </nav>
+    <div class="header-actions">
+      <button class="btn dark-ghost" type="button" data-login><svg class="ico"><use href="#i-user"/></svg>Iniciar sesión</button>
+      <a class="btn" href="#apadrina"><svg class="ico fill"><use href="#i-heart"/></svg>Donar</a>
+    </div>
+  </div>
+  <p class="wrap inline-msg" id="login-msg" aria-live="polite" hidden></p>
+</header>
+
+<main>
+
+<!-- ================= INICIO ================= -->
+<div data-view="inicio">
+  <section class="hero" aria-labelledby="t-inicio">
+    <div class="wrap">
+      <div>
+        <h1 id="t-inicio">El talento está en todas partes. <span class="accent">Las oportunidades, no.</span></h1>
+        <p>Conectamos a jóvenes en contextos vulnerables con padrinos, oportunidades educativas y acompañamiento continuo.</p>
+        <div class="hero-actions">
+          <a class="btn" href="#apadrina"><svg class="ico fill"><use href="#i-heart"/></svg>Apadrina a un joven &rarr;</a>
+          <a class="btn ghost" href="#convocatorias"><svg class="ico"><use href="#i-doc"/></svg>Ver convocatorias</a>
+        </div>
+      </div>
+      <svg class="hero-heart" viewBox="0 0 120 120" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M60 104C30 82 14 67 14 47c0-13 10-23 23-23 9 0 17 5 23 12 6-7 14-12 23-12 13 0 23 10 23 23 0 20-16 35-46 57Z"/><path d="M60 6v12M38 12l6 9M82 12l-6 9"/></g></svg>
+    </div>
+  </section>
+
+  <nav class="features" aria-label="Accesos rápidos">
+    <div class="wrap">
+      <a class="feature" href="#apadrina"><svg class="ico"><use href="#i-users"/></svg><span><h3>Apadrinamiento</h3><span class="muted small">Conecta con un joven y sé parte de su historia.</span></span></a>
+      <a class="feature" href="#convocatorias"><svg class="ico"><use href="#i-megaphone"/></svg><span><h3>Convocatorias</h3><span class="muted small">Accede y comparte oportunidades educativas.</span></span></a>
+      <a class="feature" href="#padres"><svg class="ico"><use href="#i-book"/></svg><span><h3>Recursos para padres</h3><span class="muted small">Herramientas prácticas para acompañar su desarrollo.</span></span></a>
+      <a class="feature" href="#impacto"><svg class="ico"><use href="#i-chart"/></svg><span><h3>Transparencia e impacto</h3><span class="muted small">Conoce el avance y resultados reales de la comunidad.</span></span></a>
+    </div>
+  </nav>
+
+  <section class="duo" aria-label="Avance y donativo">
+    <div class="wrap">
+      <div class="box">
+        <div class="box-head">
+          <div><h2>Sigue el avance</h2><p class="muted small">Conoce el progreso de los jóvenes que están siendo acompañados.</p></div>
+          <a class="see-all" href="#avance">Ver todos los estudiantes</a>
+        </div>
+        <div class="student">
+          <div class="student-id">
+            <span class="initials" aria-hidden="true">LF</span>
+            <div><h3>Luis Fernando</h3><p class="muted small">17 años · Guanajuato</p><span class="tag neutral">Ejemplo</span></div>
+          </div>
+          <div class="goal">
+            <p class="small"><b>Meta académica</b><br><span class="muted">Ingresará a la carrera de Ingeniería en Sistemas</span></p>
+            <div class="bar-row"><div class="bar" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" aria-label="Avance hacia la meta"><i style="width:70%"></i></div><span class="num">70&nbsp;%</span></div>
+            <div class="mini">
+              <span><svg class="ico"><use href="#i-cap"/></svg>Beca</span>
+              <span><svg class="ico"><use href="#i-book"/></svg>8 de 10 materias</span>
+              <span><svg class="ico"><use href="#i-chart"/></svg>Avance general 70&nbsp;%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="box">
+        <div><h2>Apoya hoy</h2><p class="muted small">Tu aportación abre caminos. Súmate y transforma vidas.</p></div>
+        <div class="amounts" id="home-amounts" role="group" aria-label="Monto del donativo"></div>
+        <button class="btn block" type="button" id="home-donar"><svg class="ico fill"><use href="#i-heart"/></svg>Hacer donación &rarr;</button>
+        <div class="confirm" id="home-confirm" hidden aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="duo" aria-label="Convocatorias y recursos">
+    <div class="wrap">
+      <div class="box">
+        <div class="box-head"><h2>Convocatorias para jóvenes</h2><a class="see-all" href="#convocatorias">Ver todas las convocatorias</a></div>
+        <ul class="rows" id="home-calls"></ul>
+      </div>
+      <div class="box">
+        <div class="box-head"><h2>Recursos para madres y padres</h2><a class="see-all" href="#padres">Ver todos los recursos</a></div>
+        <ul class="rows" id="home-resources"></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="stats" aria-label="Cifras de ejemplo">
+    <div class="wrap">
+      <div class="stat"><svg class="ico"><use href="#i-users"/></svg><div><b>120</b><span>jóvenes conectados</span></div></div>
+      <div class="stat"><svg class="ico"><use href="#i-user"/></svg><div><b>85</b><span>padrinos activos</span></div></div>
+      <div class="stat"><svg class="ico"><use href="#i-cap"/></svg><div><b>40</b><span>convocatorias publicadas</span></div></div>
+      <div class="stat"><svg class="ico"><use href="#i-heart"/></svg><div><b>92&nbsp;%</b><span>continúa sus estudios</span></div></div>
+      <p class="stats-note">Cifras de ejemplo para el prototipo: RED DAVID está en etapa de investigación y aún no tiene resultados.</p>
+    </div>
+  </section>
+</div>
+
+<!-- ================= APADRINA ================= -->
+<section class="inner" data-view="apadrina" aria-labelledby="t-apadrina" hidden>
+  <div class="wrap">
+    <div class="inner-head">
+      <h2 id="t-apadrina">Apadrina a un joven</h2>
+      <p>Para protegerlos no publicamos fotos, apellidos ni ubicaciones exactas. Compartimos su historia, su sueño y lo que necesita para seguir estudiando.</p>
+    </div>
+    <div class="cards" id="stories"></div>
+    <div class="split">
+      <div class="panel">
+        <div class="box-head"><h3>Haz tu donativo</h3>
+          <div class="seg" role="group" aria-label="Frecuencia">
+            <button type="button" id="freq-unica" aria-pressed="true">Única</button>
+            <button type="button" id="freq-mensual" aria-pressed="false">Mensual</button>
+          </div>
+        </div>
+        <div class="amounts" id="amounts" role="group" aria-label="Monto del donativo"></div>
+        <div class="field"><label for="destino">¿A quién va tu apoyo?</label><select id="destino"></select></div>
+        <button class="btn block" type="button" id="donar"><svg class="ico fill"><use href="#i-heart"/></svg>Hacer donación &rarr;</button>
+        <div class="confirm" id="confirm" hidden aria-live="polite"></div>
+      </div>
+      <div class="panel">
+        <h3>Qué pasa con tu donativo</h3>
+        <ul class="dots-list">
+          <li><span>El pago se procesa en una plataforma de pago certificada; RED DAVID no guarda datos de tarjetas.</span></li>
+          <li><span>Trabajamos con donatarias autorizadas para que puedas pedir tu recibo deducible.</span></li>
+          <li><span>El apoyo cubre gastos concretos: transporte, materiales, colegiaturas y tutorías.</span></li>
+          <li><span>Recibes actualizaciones del avance en <a href="#avance">Sigue el avance</a>.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= AVANCE ================= -->
+<section class="inner" data-view="avance" aria-labelledby="t-avance" hidden>
+  <div class="wrap">
+    <div class="inner-head">
+      <h2 id="t-avance">Sigue el avance</h2>
+      <p>Cada padrino ve el progreso del joven que apoya, sin datos que lo pongan en riesgo. <span class="tag neutral">Ejemplo</span></p>
+    </div>
+    <div class="split" style="margin-top:0">
+      <div class="panel">
+        <div class="card-top"><span class="initials" aria-hidden="true">LF</span><div><h3>Luis Fernando, 17 años</h3><p class="muted small">Preparatoria · Guanajuato</p></div></div>
+        <p class="small"><b>Meta:</b> ingresar a la carrera de Ingeniería en Sistemas</p>
+        <div class="bar-row"><div class="bar" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100" aria-label="Avance hacia la meta"><i style="width:70%"></i></div><span class="num">70&nbsp;%</span></div>
+        <div class="kpis">
+          <div class="kpi"><b>92&nbsp;%</b><span>Asistencia</span></div>
+          <div class="kpi"><b>8 de 10</b><span>Materias aprobadas</span></div>
+          <div class="kpi"><b>6 de 8</b><span>Tutorías tomadas</span></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Actualizaciones</h3>
+        <ol class="timeline">
+          <li><b>Octubre</b><span>Terminó el primer parcial con promedio de 8.9 y asistió a todas sus tutorías de matemáticas.</span></li>
+          <li><b>Septiembre</b><span>Recibió su apoyo de transporte y su paquete de materiales.</span></li>
+          <li><b>Agosto</b><span>Se conectó con su padrino y definió su meta con su tutora.</span></li>
+        </ol>
+      </div>
+    </div>
+    <div class="privacy">
+      <div class="panel yes"><h3>Lo que sí compartimos</h3><ul><li>Nombre de pila y edad</li><li>Su meta académica y su avance</li><li>Asistencia, materias y tutorías</li><li>Mensajes que el joven decida enviar</li></ul></div>
+      <div class="panel no"><h3>Lo que nunca mostramos</h3><ul><li>Fotos, apellidos o dirección</li><li>Nombre de su escuela o ubicación exacta</li><li>Datos de contacto del joven o su familia</li><li>Información de salud o situación familiar delicada</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONVOCATORIAS ================= -->
+<section class="inner" data-view="convocatorias" aria-labelledby="t-conv" hidden>
+  <div class="wrap">
+    <div class="inner-head"><h2 id="t-conv">Convocatorias para jóvenes</h2><p>Becas, mentorías y cursos en un solo lugar, con su fecha de cierre. <span class="tag neutral">Ejemplos</span></p></div>
+    <div class="chips" role="group" aria-label="Filtrar convocatorias">
+      <button class="chip" type="button" data-filter="todas" aria-pressed="true">Todas</button>
+      <button class="chip" type="button" data-filter="Beca" aria-pressed="false">Becas</button>
+      <button class="chip" type="button" data-filter="Mentoría" aria-pressed="false">Mentorías</button>
+      <button class="chip" type="button" data-filter="Curso" aria-pressed="false">Cursos</button>
+    </div>
+    <div class="cards" id="calls"></div>
+  </div>
+</section>
+
+<!-- ================= RECURSOS PARA PADRES ================= -->
+<section class="inner" data-view="padres" aria-labelledby="t-padres" hidden>
+  <div class="wrap">
+    <div class="inner-head"><h2 id="t-padres">Recursos para madres y padres</h2><p>Materiales prácticos para acompañar el estudio y el bienestar de tus hijos. Lo que se recauda ayuda a sostener la red; para las familias de RED DAVID son gratuitos.</p></div>
+    <div class="cards" id="resources"></div>
+  </div>
+</section>
+
+<!-- ================= IMPACTO ================= -->
+<section class="inner" data-view="impacto" aria-labelledby="t-impacto" hidden>
+  <div class="wrap" style="display:grid; gap:36px">
+    <div class="inner-head" style="margin-bottom:0"><h2 id="t-impacto">Transparencia e impacto</h2><p>Empezar pequeño, hacerlo bien y crecer. Antes de publicar cifras de impacto vamos a validar el modelo en un piloto.</p></div>
+    <div class="roadmap">
+      <div class="phase"><span class="tag">Etapa actual</span><h3>Escuchar</h3><p class="muted small">Investigación, conversaciones y prototipos con estudiantes y familias de Janicho, Salvatierra, Guanajuato.</p></div>
+      <div class="phase"><span class="tag neutral">Siguiente</span><h3>Pilotear</h3><p class="muted small">Validar apoyos, tutores y un seguimiento seguro con un grupo pequeño.</p></div>
+      <div class="phase"><span class="tag neutral">Después</span><h3>Escalar</h3><p class="muted small">Lanzar la plataforma y ampliar alianzas.</p></div>
+    </div>
+    <div class="split" style="margin-top:0">
+      <div style="display:grid; gap:12px">
+        <h3>Cómo vamos a medir el impacto</h3>
+        <div class="indicators">
+          <div class="panel" style="gap:4px"><b>Continuidad escolar</b><span class="muted small">Jóvenes que siguen inscritos al terminar el ciclo.</span></div>
+          <div class="panel" style="gap:4px"><b>Asistencia</b><span class="muted small">Clases y tutorías a las que asisten.</span></div>
+          <div class="panel" style="gap:4px"><b>Gastos cubiertos</b><span class="muted small">Transporte, materiales y colegiaturas pagados a tiempo.</span></div>
+          <div class="panel" style="gap:4px"><b>Acceso a oportunidades</b><span class="muted small">Becas y cursos a los que se postulan y que obtienen.</span></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>A dónde va el dinero</h3>
+        <ul class="dots-list">
+          <li><span><b>Apoyo directo:</b> transporte, materiales y colegiaturas.</span></li>
+          <li><span><b>Acompañamiento:</b> tutorías y orientación psicológica.</span></li>
+          <li><span><b>Operación:</b> la plataforma y la protección de datos.</span></li>
+        </ul>
+        <p class="muted small">Publicaremos un reporte periódico con el destino de los fondos.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= NOSOTROS ================= -->
+<section class="inner" data-view="nosotros" aria-labelledby="t-nosotros" hidden>
+  <div class="wrap">
+    <div class="split" style="margin-top:0">
+      <div style="display:grid; gap:14px; align-content:start">
+        <h2 id="t-nosotros">Una iniciativa nacida del vínculo y la escucha de la comunidad</h2>
+        <p class="muted">RED DAVID surge en Janicho, Salvatierra, Guanajuato. Muchas personas ya ayudan a los jóvenes de la comunidad, pero cada quien por su cuenta. Queremos formalizar esa solidaridad para que sea segura, transparente y sostenible.</p>
+        <h3>Alianzas por construir</h3>
+        <div class="allies"><span class="tag neutral">Escuelas</span><span class="tag neutral">Universidades</span><span class="tag neutral">Especialistas en salud mental</span><span class="tag neutral">Empresas con responsabilidad social</span><span class="tag neutral">Donatarias autorizadas</span><span class="tag neutral">Líderes comunitarios</span></div>
+      </div>
+      <form class="panel" id="aliados" novalidate>
+        <h3>Buscamos aliados para el primer piloto</h3>
+        <div class="field"><label for="a-nombre">Nombre u organización</label><input id="a-nombre" autocomplete="organization"></div>
+        <div class="field"><label for="a-tipo">¿Cómo te gustaría ayudar?</label><select id="a-tipo"><option>Validar el modelo</option><option>Financiar el piloto</option><option>Acompañar como tutor o especialista</option><option>Difundir el proyecto</option></select></div>
+        <div class="field"><label for="a-correo">Correo</label><input id="a-correo" type="email" autocomplete="email"></div>
+        <button class="btn block" type="submit">Quiero ser aliado</button>
+        <p class="inline-msg" id="aliados-msg" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <a class="brand" href="#inicio" aria-label="RED DAVID, inicio"><svg class="logo" style="width:28px;height:28px"><use href="#logo"/></svg><span><span class="brand-name" style="font-size:1rem">RED DAVID</span><span class="brand-sub">Oportunidades que transforman</span></span></a>
+    <nav aria-label="Pie de página"><a href="#inicio">Inicio</a><a href="#convocatorias">Convocatorias</a><a href="#apadrina">Apadrina</a><a href="#padres">Recursos para padres</a><a href="#impacto">Impacto</a><a href="#nosotros">Nosotros</a></nav>
+    <div class="contact"><span><svg class="ico"><use href="#i-mail"/></svg>Correo de contacto por definir</span><span><svg class="ico"><use href="#i-pin"/></svg>Salvatierra, Guanajuato</span></div>
+    <p class="foot-note">Prototipo académico · Semana Tec «Soluciones frugales para la transformación social» (Gpo 202).</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  const $ = (s, el = document) => el.querySelector(s);
+  const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+  const mxn = n => "$" + Number(n).toLocaleString("es-MX");
+
+  /* ---------- Datos de ejemplo ---------- */
+  const historias = [
+    { id: "luis", ini: "LF", nombre: "Luis Fernando", edad: 17, nivel: "Preparatoria",
+      historia: "Arma y repara celulares de sus vecinos. Hace la tarea en el celular de su mamá porque no tienen computadora.",
+      sueno: "Estudiar Ingeniería en Sistemas", necesidad: "Datos móviles para tareas", monto: 250 },
+    { id: "ana", ini: "A", nombre: "Ana", edad: 16, nivel: "Preparatoria",
+      historia: "Le gustan las ciencias y cuida a sus hermanos por las tardes. Para llegar a la prepa toma dos camiones.",
+      sueno: "Estudiar enfermería", necesidad: "Transporte del mes", monto: 600 },
+    { id: "lupita", ini: "L", nombre: "Lupita", edad: 17, nivel: "Preparatoria",
+      historia: "Da clases de regularización a niños de su calle los sábados. Será la primera de su familia en ir a la universidad.",
+      sueno: "Ser maestra de primaria", necesidad: "Examen de admisión", monto: 850 }
+  ];
+  const montos = [
+    { v: 100, t: "Apoya materiales" }, { v: 300, t: "Contribuye a talleres" },
+    { v: 500, t: "Impulsa su educación" }, { v: 1000, t: "Genera más oportunidades" }
+  ];
+  const convocatorias = [
+    { tipo: "Beca", titulo: "Beca de transporte", desc: "Apoyo mensual para jóvenes que deben trasladarse a otra localidad para estudiar.", cierre: "15 dic 2026", alcance: "Guanajuato" },
+    { tipo: "Mentoría", titulo: "Convocatoria de mentoría", desc: "Una sesión semanal en línea con universitarios para orientar tu plan de estudios.", cierre: "30 nov 2026", alcance: "En línea" },
+    { tipo: "Curso", titulo: "Curso propedéutico", desc: "Prepárate para el examen de admisión con materiales gratuitos.", cierre: "20 ene 2027", alcance: "En línea" },
+    { tipo: "Beca", titulo: "Beca de útiles escolares", desc: "Paquete de materiales para el inicio del semestre.", cierre: "10 ene 2027", alcance: "Salvatierra, Gto." },
+    { tipo: "Curso", titulo: "Taller de programación básica", desc: "Crea tu primera página web en ocho sesiones, desde el celular.", cierre: "5 dic 2026", alcance: "En línea" },
+    { tipo: "Mentoría", titulo: "Orientación vocacional", desc: "Acompañamiento para elegir carrera según tus intereses.", cierre: "Abierta todo el año", alcance: "En línea" }
+  ];
+  const recursos = [
+    { titulo: "Guía para apoyar el estudio en casa", tipo: "Guía", corta: "Material práctico y sencillo", desc: "Estrategias para motivar y crear hábitos de estudio, aunque tengas poco tiempo.", precio: 120 },
+    { titulo: "Hablemos de emociones", tipo: "Taller", corta: "Herramientas para fortalecer su bienestar", desc: "Cómo conversar con tus hijos sobre estrés, miedo y presión social.", precio: 150 },
+    { titulo: "Taller para madres y padres", tipo: "Taller", corta: "Videos y ejercicios para acompañar su desarrollo", desc: "Ejercicios cortos para acompañar a tus hijos en la adolescencia.", precio: 200 }
+  ];
+
+  /* ---------- Navegación ---------- */
+  const vistas = $$("[data-view]");
+  const enlaces = $$("nav.main > a");
+  const nav = $("#main-nav"), toggle = $("#menu-toggle");
+  function mostrar(nombre, desplazar) {
+    if (!vistas.some(v => v.dataset.view === nombre)) nombre = "inicio";
+    vistas.forEach(v => { v.hidden = v.dataset.view !== nombre; });
+    const activo = nombre === "avance" ? "inicio" : nombre;
+    enlaces.forEach(a => a.setAttribute("aria-current", a.getAttribute("href") === "#" + activo ? "page" : "false"));
+    nav.classList.remove("open"); toggle.setAttribute("aria-expanded", "false");
+    if (desplazar) window.scrollTo({ top: 0 });
+  }
+  window.addEventListener("hashchange", () => mostrar(location.hash.slice(1), true));
+  toggle.addEventListener("click", () => toggle.setAttribute("aria-expanded", String(nav.classList.toggle("open"))));
+  $$("[data-login]").forEach(b => b.addEventListener("click", () => {
+    const m = $("#login-msg"); m.hidden = false;
+    m.textContent = "En el prototipo no hay cuentas. En la versión real, padrinos y familias entrarían aquí para ver su seguimiento.";
+  }));
+
+  /* ---------- Selector de montos (portada y Apadrina) ---------- */
+  function selectorMontos(caja, inicial) {
+    let monto = inicial;
+    caja.innerHTML = montos.map(m => `<button type="button" class="amount" data-v="${m.v}" aria-pressed="${m.v === inicial}"><b>${mxn(m.v)}</b><span>${m.t}</span></button>`).join("") +
+      `<label class="amount other"><span>Otra cantidad</span><input type="number" min="20" step="10" inputmode="numeric" placeholder="$" aria-label="Otra cantidad en pesos"></label>`;
+    caja.addEventListener("click", e => {
+      const b = e.target.closest("button.amount"); if (!b) return;
+      monto = Number(b.dataset.v); caja.querySelector("input").value = "";
+      $$("button.amount", caja).forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    });
+    caja.querySelector("input").addEventListener("input", e => {
+      const v = Number(e.target.value);
+      if (v > 0) { monto = v; $$("button.amount", caja).forEach(x => x.setAttribute("aria-pressed", "false")); }
+    });
+    return () => monto;
+  }
+  function confirmar(el, monto, extra) {
+    el.hidden = false;
+    if (!(monto >= 20)) { el.innerHTML = "<b>Elige un monto de al menos $20.</b>"; return; }
+    el.innerHTML = `<b>Así se vería tu confirmación: donativo de ${mxn(monto)}${extra}.</b><span>Es un prototipo: no se hizo ningún cobro. En la versión real el pago pasaría por una plataforma certificada y recibirías tu recibo deducible por correo.</span>`;
+  }
+  const montoPortada = selectorMontos($("#home-amounts"), 500);
+  $("#home-donar").addEventListener("click", () => confirmar($("#home-confirm"), montoPortada(), ""));
+
+  /* ---------- Listas de la portada ---------- */
+  $("#home-calls").innerHTML = convocatorias.slice(0, 3).map(c =>
+    `<li><span>${c.titulo}</span><span><span class="tag">${c.tipo}</span></span><span class="when">Cierre: ${c.cierre}</span></li>`).join("");
+  $("#home-resources").innerHTML = recursos.map(r =>
+    `<li><span>${r.titulo}</span><span><span class="tag">${r.tipo}</span></span><span class="desc">${r.corta}</span></li>`).join("");
+
+  /* ---------- Apadrina ---------- */
+  const destino = $("#destino");
+  destino.innerHTML = '<option value="general">Donde más se necesite</option>' + historias.map(h => `<option value="${h.id}">${h.nombre}, ${h.edad} años</option>`).join("");
+  $("#stories").innerHTML = historias.map(h => `
+    <article class="card" data-id="${h.id}" aria-pressed="false">
+      <div class="card-top"><span class="initials soft" aria-hidden="true">${h.ini}</span><div><h3>${h.nombre}, ${h.edad} años</h3><p class="muted small">${h.nivel}</p></div></div>
+      <span class="tag neutral" style="justify-self:start">Historia de ejemplo</span>
+      <p class="small">${h.historia}</p>
+      <p class="small"><b>Su sueño:</b> ${h.sueno}</p>
+      <div class="need"><span>${h.necesidad}</span><b>${mxn(h.monto)}</b></div>
+      <button class="btn" type="button" data-apadrinar="${h.id}">Apadrinar a ${h.nombre.split(" ")[0]}</button>
+    </article>`).join("");
+  function elegir(id) { destino.value = id; $$("#stories .card").forEach(s => s.setAttribute("aria-pressed", String(s.dataset.id === id))); }
+  $("#stories").addEventListener("click", e => {
+    const b = e.target.closest("[data-apadrinar]"); if (!b) return;
+    elegir(b.dataset.apadrinar); $("#amounts").scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+  destino.addEventListener("change", () => elegir(destino.value));
+  const montoApadrina = selectorMontos($("#amounts"), 300);
+  let frecuencia = "única";
+  [["#freq-unica", "única"], ["#freq-mensual", "mensual"]].forEach(([sel, val]) => $(sel).addEventListener("click", () => {
+    frecuencia = val;
+    $("#freq-unica").setAttribute("aria-pressed", String(val === "única"));
+    $("#freq-mensual").setAttribute("aria-pressed", String(val === "mensual"));
+  }));
+  $("#donar").addEventListener("click", () => {
+    const h = historias.find(x => x.id === destino.value);
+    confirmar($("#confirm"), montoApadrina(), (frecuencia === "mensual" ? " al mes" : "") + (h ? ` para ${h.nombre}` : " para donde más se necesite"));
+  });
+
+  /* ---------- Convocatorias ---------- */
+  function pintar(filtro) {
+    $("#calls").innerHTML = convocatorias.filter(c => filtro === "todas" || c.tipo === filtro).map(c => `
+      <article class="card">
+        <span class="tag" style="justify-self:start">${c.tipo}</span>
+        <h3>${c.titulo}</h3><p class="muted small">${c.desc}</p>
+        <dl><dt>Cierre</dt><dd>${c.cierre}</dd><dt>Dónde</dt><dd>${c.alcance}</dd></dl>
+        <button class="btn ghost" type="button" data-ver>Ver convocatoria</button>
+        <p class="inline-msg" aria-live="polite"></p>
+      </article>`).join("");
+  }
+  pintar("todas");
+  $$(".chip").forEach(ch => ch.addEventListener("click", () => {
+    $$(".chip").forEach(x => x.setAttribute("aria-pressed", String(x === ch))); pintar(ch.dataset.filter);
+  }));
+  $("#calls").addEventListener("click", e => {
+    const b = e.target.closest("[data-ver]"); if (b) b.nextElementSibling.textContent = "En la versión real aquí se abren los requisitos y el enlace oficial.";
+  });
+
+  /* ---------- Recursos ---------- */
+  $("#resources").innerHTML = recursos.map(r => `
+    <article class="card">
+      <span class="tag" style="justify-self:start">${r.tipo}</span>
+      <h3>${r.titulo}</h3><p class="muted small">${r.desc}</p>
+      <div class="need"><span class="price">${mxn(r.precio)} MXN</span><button class="btn" type="button" data-recurso>Ver recurso</button></div>
+      <p class="inline-msg" aria-live="polite"></p>
+    </article>`).join("");
+  $("#resources").addEventListener("click", e => {
+    const b = e.target.closest("[data-recurso]"); if (b) b.closest(".card").querySelector(".inline-msg").textContent = "Prototipo: la compra todavía no está disponible.";
+  });
+
+  /* ---------- Aliados ---------- */
+  $("#aliados").addEventListener("submit", e => {
+    e.preventDefault();
+    const msg = $("#aliados-msg"), nombre = $("#a-nombre").value.trim(), correo = $("#a-correo");
+    if (!nombre) { msg.textContent = "Escribe tu nombre u organización."; $("#a-nombre").focus(); return; }
+    if (!correo.value.trim() || !correo.checkValidity()) { msg.textContent = "Escribe un correo válido, por ejemplo nombre@dominio.com."; correo.focus(); return; }
+    msg.textContent = `Gracias, ${nombre}. En este prototipo no se envía nada; en la versión real te contactaríamos por correo.`;
+  });
+
+  mostrar(location.hash.slice(1), false);
+})();
+</script>
+
+</html>
